@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rpg-superheroes",
+  "compatibility_date": "2024-01-01",
+  "pages_build_output_dir": "./dist",
+  "compatibility_flags": ["nodejs_compat"],
+  
+  // D1 Database for game data
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rpg-production",
+      "database_id": "placeholder-will-be-updated-after-create"
+    }
+  ]
+}
