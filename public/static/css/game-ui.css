@@ -1,0 +1,457 @@
+/* =====================================================
+   RPG SUPERHEROES - GAMING UI STYLES
+   Pixelated HD Aesthetic with Color-Coded Systems
+   ===================================================== */
+
+/* === GLOBAL GAMING THEME === */
+:root {
+  /* Rarity Colors */
+  --rarity-c: #6c757d;
+  --rarity-b: #28a745;
+  --rarity-a: #007bff;
+  --rarity-s: #6f42c1;
+  --rarity-ss: #dc3545;
+  --rarity-sss: #ffd700;
+  
+  /* Power Type Colors */
+  --type-fire: #ff4500;
+  --type-water: #1e90ff;
+  --type-earth: #8b4513;
+  --type-air: #87ceeb;
+  --type-light: #fff8dc;
+  --type-dark: #2f4f4f;
+  --type-electric: #ffff00;
+  --type-ice: #00ffff;
+  --type-poison: #9932cc;
+  --type-psychic: #ff69b4;
+  --type-steel: #c0c0c0;
+  --type-nature: #32cd32;
+  
+  /* UI Colors */
+  --ui-primary: #1a1a2e;
+  --ui-secondary: #16213e;
+  --ui-accent: #0f3460;
+  --ui-highlight: #e94560;
+  --ui-text: #ffffff;
+  --ui-text-dim: #a8a8a8;
+  
+  /* Shadows & Effects */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+  --glow-sm: 0 0 10px;
+  --glow-md: 0 0 20px;
+  --glow-lg: 0 0 30px;
+}
+
+/* === PIXELATED FONT STYLE === */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+.pixel-font {
+  font-family: 'Press Start 2P', cursive;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.game-font {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+
+/* === RARITY BORDERS & BACKGROUNDS === */
+.rarity-border-c {
+  border: 3px solid var(--rarity-c);
+  box-shadow: 0 0 15px var(--rarity-c);
+}
+
+.rarity-border-b {
+  border: 3px solid var(--rarity-b);
+  box-shadow: 0 0 15px var(--rarity-b);
+}
+
+.rarity-border-a {
+  border: 3px solid var(--rarity-a);
+  box-shadow: 0 0 15px var(--rarity-a);
+}
+
+.rarity-border-s {
+  border: 3px solid var(--rarity-s);
+  box-shadow: 0 0 15px var(--rarity-s);
+}
+
+.rarity-border-ss {
+  border: 3px solid var(--rarity-ss);
+  box-shadow: 0 0 15px var(--rarity-ss);
+}
+
+.rarity-border-sss {
+  border: 3px solid var(--rarity-sss);
+  box-shadow: 0 0 20px var(--rarity-sss), 0 0 40px rgba(255, 215, 0, 0.5);
+  animation: pulse-gold 2s ease-in-out infinite;
+}
+
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 20px var(--rarity-sss), 0 0 40px rgba(255, 215, 0, 0.5); }
+  50% { box-shadow: 0 0 30px var(--rarity-sss), 0 0 60px rgba(255, 215, 0, 0.8); }
+}
+
+/* Rarity Backgrounds */
+.rarity-bg-c { background: linear-gradient(135deg, #6c757d, #495057); }
+.rarity-bg-b { background: linear-gradient(135deg, #28a745, #20c997); }
+.rarity-bg-a { background: linear-gradient(135deg, #007bff, #0056b3); }
+.rarity-bg-s { background: linear-gradient(135deg, #6f42c1, #9b59b6); }
+.rarity-bg-ss { background: linear-gradient(135deg, #dc3545, #c82333); }
+.rarity-bg-sss { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; }
+
+/* === POWER TYPE BORDERS === */
+.type-border-fire { border: 2px solid var(--type-fire); }
+.type-border-water { border: 2px solid var(--type-water); }
+.type-border-earth { border: 2px solid var(--type-earth); }
+.type-border-air { border: 2px solid var(--type-air); }
+.type-border-light { border: 2px solid var(--type-light); }
+.type-border-dark { border: 2px solid var(--type-dark); }
+.type-border-electric { border: 2px solid var(--type-electric); }
+.type-border-ice { border: 2px solid var(--type-ice); }
+.type-border-poison { border: 2px solid var(--type-poison); }
+.type-border-psychic { border: 2px solid var(--type-psychic); }
+.type-border-steel { border: 2px solid var(--type-steel); }
+.type-border-nature { border: 2px solid var(--type-nature); }
+
+/* Type Badges */
+.type-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.type-badge-fire { background: var(--type-fire); color: white; }
+.type-badge-water { background: var(--type-water); color: white; }
+.type-badge-earth { background: var(--type-earth); color: white; }
+.type-badge-air { background: var(--type-air); color: black; }
+.type-badge-light { background: var(--type-light); color: black; }
+.type-badge-dark { background: var(--type-dark); color: white; }
+.type-badge-electric { background: var(--type-electric); color: black; }
+.type-badge-ice { background: var(--type-ice); color: black; }
+.type-badge-poison { background: var(--type-poison); color: white; }
+.type-badge-psychic { background: var(--type-psychic); color: white; }
+.type-badge-steel { background: var(--type-steel); color: black; }
+.type-badge-nature { background: var(--type-nature); color: black; }
+
+/* === HERO CARDS === */
+.hero-card {
+  position: relative;
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.hero-card::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  border-radius: 12px;
+  opacity: 0.5;
+}
+
+.hero-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  filter: brightness(1.2);
+}
+
+.hero-card-sss:hover {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateY(-8px) translateX(0); }
+  25% { transform: translateY(-8px) translateX(-5px); }
+  75% { transform: translateY(-8px) translateX(5px); }
+}
+
+/* Hero Avatar */
+.hero-avatar {
+  font-size: 3rem;
+  text-align: center;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+}
+
+/* === STAT BARS === */
+.stat-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  transition: width 0.5s ease;
+  border-radius: 4px;
+}
+
+.stat-bar-hp { background: linear-gradient(90deg, #ff4444, #ff6666); }
+.stat-bar-atk { background: linear-gradient(90deg, #ff8800, #ffaa00); }
+.stat-bar-def { background: linear-gradient(90deg, #4444ff, #6666ff); }
+.stat-bar-spd { background: linear-gradient(90deg, #44ff44, #66ff66); }
+
+/* === BUTTONS === */
+.btn-game {
+  position: relative;
+  padding: 12px 24px;
+  border: 3px solid currentColor;
+  border-radius: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-game::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-game:hover::before {
+  left: 100%;
+}
+
+.btn-game:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-game:active {
+  transform: scale(0.95);
+}
+
+/* Button Variants */
+.btn-primary { background: #007bff; color: white; }
+.btn-success { background: #28a745; color: white; }
+.btn-danger { background: #dc3545; color: white; }
+.btn-warning { background: #ffc107; color: black; }
+.btn-legendary { 
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  color: black;
+  animation: glow-gold 2s ease-in-out infinite;
+}
+
+@keyframes glow-gold {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+  50% { box-shadow: 0 0 40px rgba(255, 215, 0, 1); }
+}
+
+/* === DUNGEON CARDS === */
+.dungeon-card {
+  position: relative;
+  border-radius: 12px;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--ui-secondary), var(--ui-accent));
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.dungeon-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.dungeon-card:hover::before {
+  left: 100%;
+}
+
+.dungeon-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Difficulty Badges */
+.difficulty-easy { background: #28a745; color: white; }
+.difficulty-normal { background: #17a2b8; color: white; }
+.difficulty-hard { background: #ffc107; color: black; }
+.difficulty-nightmare { background: #dc3545; color: white; }
+.difficulty-hell { background: #000; color: #ff0000; }
+
+/* === MODALS === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: linear-gradient(135deg, var(--ui-secondary), var(--ui-accent));
+  border: 3px solid var(--ui-highlight);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* === PROGRESS BARS === */
+.progress-container {
+  width: 100%;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff00, #00cc00);
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* === MOBILE OPTIMIZATIONS === */
+@media (max-width: 768px) {
+  .hero-card {
+    padding: 12px;
+  }
+  
+  .hero-avatar {
+    font-size: 2rem;
+  }
+  
+  .btn-game {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .modal-content {
+    max-width: 95%;
+    padding: 16px;
+  }
+  
+  .pixel-font, .game-font {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-card {
+    padding: 8px;
+  }
+  
+  .hero-avatar {
+    font-size: 1.5rem;
+  }
+  
+  .btn-game {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+  }
+  
+  .type-badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+}
+
+/* === ANIMATIONS === */
+@keyframes bounce-in {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.bounce-in {
+  animation: bounce-in 0.5s ease;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* === UTILITY CLASSES === */
+.shadow-pixel {
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+.border-pixel {
+  border: 4px solid currentColor;
+}
+
+.text-shadow-game {
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
+}
+
+.bg-game-dark {
+  background: linear-gradient(135deg, var(--ui-primary), var(--ui-secondary));
+}
+
+.bg-game-darker {
+  background: linear-gradient(135deg, #0a0a0f, var(--ui-primary));
+}
