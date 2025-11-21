@@ -13,6 +13,7 @@ A comprehensive browser-based RPG game with superpowers, essence-based progressi
 - **Hero Collection** - 15+ unique heroes across 12 power types (Fire, Water, Earth, Air, Light, Dark, Electric, Ice, Poison, Psychic, Steel, Nature)
 - **Resource Management** - 25+ different resource types including currencies, upgrade materials, and crafting components
 - **Comprehensive Database** - 30+ database tables with full relational structure
+- **Bottom Navigation UI** - Mobile-optimized tab navigation with proper sizing and no text overflow
 
 #### ✅ Gacha System
 - **Multiple Banner Types** - Basic, Advanced, Essence-specific, and Limited Event banners
@@ -31,6 +32,20 @@ A comprehensive browser-based RPG game with superpowers, essence-based progressi
 - **Awakening** - 10 awakening levels for additional power
 - **Limit Break** - Break level caps for stronger heroes
 - **Potential System** - Unlock hidden potential for stat bonuses
+
+#### ✅ Exploration System (NEW!)
+- **Auto-Movement** - Heroes move automatically across the map
+- **Auto-Battle** - Combat happens automatically with real-time updates
+- **Resource Nodes** - 20 procedurally generated nodes with rarity-based spawning
+- **Resource Gathering** - Dispatch heroes to gather resources with timers
+- **Rarity-Based Timers** - Common: 5s gather/30s cooldown → Legendary: 120s gather/600s cooldown
+- **Visual Map** - 1000x800px canvas with pixelated aesthetic
+- **Center Spawn Area** - Heroes always spawn at center (500, 400)
+- **Respawn Mechanics** - Heroes respawn at center when defeated
+- **Enemy Wave System** - AI-generated enemy teams with dynamic difficulty
+- **Mission-Based Scaling** - Difficulty increases when thresholds met (5 waves + 10 resources)
+- **Health Restoration** - Enemies restore full health when heroes are defeated
+- **Real-Time Battle Updates** - Battle tick every 2 seconds with victory/defeat tracking
 
 #### ✅ Dungeon System
 - **Campaign Dungeons** - Story-based progression with increasing difficulty
@@ -100,14 +115,27 @@ A comprehensive browser-based RPG game with superpowers, essence-based progressi
 - `GET /api/heroes/templates` - Get all available hero templates
 - `GET /api/heroes/player` - Get player's hero collection
 - `POST /api/heroes/level-up` - Level up a hero (heroId)
+- `POST /api/heroes/generate` - Generate random heroes procedurally (count)
 
 ### Gacha
 - `GET /api/gacha/banners` - Get active gacha banners
 - `POST /api/gacha/pull` - Perform gacha pull (bannerId, pullType: 'single'/'multi')
 
+### Exploration (NEW!)
+- `GET /api/exploration/session` - Generate new exploration area with resource nodes and enemy waves
+- `POST /api/exploration/dispatch` - Dispatch hero to gather resources (heroId, resourceNodeId)
+- `POST /api/exploration/claim` - Claim gathered resources after timer expires (dispatchId)
+- `POST /api/exploration/battle-tick` - Auto-battle update with victory/defeat/respawn logic (sessionId)
+
 ### Dungeons
 - `GET /api/dungeons` - Get available dungeons for player
 - `POST /api/dungeons/battle` - Enter dungeon battle (dungeonId, teamHeroIds[])
+- `POST /api/dungeons/generate-daily` - Generate procedural daily dungeons
+
+### Team AI (NEW!)
+- `POST /api/team/optimal` - Build optimal team composition (teamSize)
+- `POST /api/team/counter` - Build counter team for enemy types (enemyTypes[], teamSize)
+- `POST /api/team/dungeon` - Build dungeon-specific team (dungeonId, teamSize)
 
 ### Missions
 - `GET /api/missions` - Get all missions and progress
@@ -123,8 +151,8 @@ A comprehensive browser-based RPG game with superpowers, essence-based progressi
 2. **Hero Team Management** - Save and switch between team compositions
 3. **Mission Claim System** - Claim rewards from completed missions
 4. **Daily Reward Claim** - Collect consecutive login bonuses
-5. **Real Battle Calculations** - Detailed turn-by-turn combat simulation
-6. **Type Advantage Calculations** - Full rock-paper-scissors damage modifiers
+5. **Persistent Exploration Sessions** - Save exploration progress to database
+6. **Resource Claim Persistence** - Store dispatched heroes in database
 
 ### Medium Priority
 7. **Clan Joining/Creation** - Full clan functionality UI
@@ -148,16 +176,16 @@ A comprehensive browser-based RPG game with superpowers, essence-based progressi
 
 ## 🎯 Recommended Next Steps
 
-1. **Implement Equipment Enhancement** - Allow players to upgrade their gear
-2. **Build Team Management UI** - Let players save different team setups
-3. **Complete Mission Claim Logic** - Reward distribution for completed missions
-4. **Add Real Combat Simulation** - Turn-based battle animations and calculations
-5. **Create Clan Features** - Full guild system with chat and activities
-6. **Build Co-op Multiplayer** - Room-based cooperative dungeons
-7. **Add Tutorial System** - Guided onboarding for new players
-8. **Implement Push Notifications** - Energy refills, event reminders
-9. **Add Sound Effects** - Audio feedback for actions
-10. **Create Admin Panel** - Manage game balance and content
+1. **Persist Exploration Data** - Save exploration sessions to D1 database
+2. **Complete Resource Dispatch** - Store hero dispatches in database with timers
+3. **Add Battle Animations** - Visual effects for combat on canvas
+4. **Implement Equipment Enhancement** - Allow players to upgrade their gear
+5. **Build Team Management UI** - Let players save different team setups
+6. **Complete Mission Claim Logic** - Reward distribution for completed missions
+7. **Create Clan Features** - Full guild system with chat and activities
+8. **Build Co-op Multiplayer** - Room-based cooperative dungeons
+9. **Add Tutorial System** - Guided onboarding for new players
+10. **Add Sound Effects** - Audio feedback for actions
 
 ## 🎨 URLs
 
@@ -219,16 +247,28 @@ A comprehensive browser-based RPG game with superpowers, essence-based progressi
 3. **First Steps** - You start with 10,000 Gold, 500 Diamonds, and 10 Basic Gacha Tokens
 
 ### Building Your Team
-1. **Summon Heroes** - Go to "Gacha" tab and use your free tokens to pull heroes
+1. **Summon Heroes** - Go to "Gacha" tab (bottom navigation) and use your free tokens to pull heroes
 2. **Check Heroes** - Navigate to "Heroes" tab to see your collection
 3. **Level Up** - Click "Level Up" on heroes (requires Level Stones)
 4. **View Stats** - See HP, Attack, Defense, and Speed for each hero
+5. **AI Team Builder** - Use "Team" tab to auto-build optimal or counter teams
+
+### Exploration System (NEW!)
+1. **Enter Exploration** - Click "Explore" tab in bottom navigation
+2. **View Map** - See visual 1000x800px map with resource nodes and enemies
+3. **Select Heroes** - Choose up to 5 heroes for dispatch
+4. **Gather Resources** - Click active resource nodes to dispatch selected heroes
+5. **Start Auto-Battle** - Click "Start Auto-Battle" for automatic combat
+6. **Monitor Progress** - Watch battle updates every 2 seconds
+7. **Track Stats** - View difficulty multiplier, resources gathered, waves defeated
+8. **Respawn Mechanic** - Heroes automatically respawn at center when defeated
 
 ### Battle System
 1. **Enter Dungeons** - Go to "Dungeons" tab to see available challenges
 2. **Check Requirements** - Each dungeon needs certain level and energy
 3. **Battle** - Click "Enter Dungeon" to automatically battle with your best heroes
 4. **Collect Rewards** - Victory grants Gold, resources, and first-clear bonuses
+5. **Procedural Dungeons** - Generate daily dungeons with random enemies
 
 ### Progression
 1. **Daily Missions** - Complete objectives for bonus rewards
@@ -242,6 +282,10 @@ A comprehensive browser-based RPG game with superpowers, essence-based progressi
 - **First Clear Bonuses** - Each dungeon gives extra rewards first time
 - **Type Advantages** - Water beats Fire, Fire beats Nature, etc.
 - **Pity System** - You're guaranteed SSS hero within 100 pulls
+- **Exploration Strategy** - Focus on rare/legendary resources for better rewards
+- **Auto-Battle Efficiency** - Keep heroes at center for quick respawns
+- **Mission Scaling** - Defeat 5 waves + gather 10 resources to increase difficulty
+- **AI Team Building** - Use counter teams when you know enemy types
 
 ## 🚀 Deployment
 
@@ -309,7 +353,19 @@ npm run deploy:prod
 
 ## 📝 Recent Updates
 
-### Version 1.0.0 (Current)
+### Version 1.1.0 (Current - 2025-01-21)
+- ✅ **Exploration System** - Complete auto-battle and resource gathering
+- ✅ **Bottom Navigation** - Mobile-optimized tab bar with proper sizing
+- ✅ **Visual Map System** - 1000x800px canvas with pixelated rendering
+- ✅ **Procedural Generation** - Dynamic hero and dungeon creation
+- ✅ **AI Team Builder** - Optimal and counter team composition
+- ✅ **Auto-Movement & Auto-Battle** - Fully automated exploration mechanics
+- ✅ **Respawn System** - Center spawn area with automatic hero revival
+- ✅ **Mission Scaling** - Dynamic difficulty adjustment based on progress
+- ✅ **Resource Node System** - Rarity-based spawning and cooldowns
+- ✅ **Real-Time Updates** - Battle ticks every 2 seconds
+
+### Version 1.0.0
 - ✅ Complete database schema with 30+ tables
 - ✅ Full backend API with authentication
 - ✅ Gacha system with pity mechanics
@@ -331,6 +387,10 @@ npm run deploy:prod
 - [x] Resource management
 
 ### Phase 2: Advanced Features (IN PROGRESS)
+- [x] Procedural generation (heroes, dungeons)
+- [x] AI team building
+- [x] Exploration system
+- [x] Auto-battle mechanics
 - [ ] Equipment enhancement
 - [ ] Team management
 - [ ] Full combat simulation
@@ -381,6 +441,6 @@ This project is provided as-is for educational purposes.
 
 ---
 
-**Last Updated**: 2025-01-17
-**Version**: 1.0.0
-**Status**: ✅ Sandbox Active - Core Systems Functional
+**Last Updated**: 2025-01-21
+**Version**: 1.1.0
+**Status**: ✅ Sandbox Active - Exploration System Complete
