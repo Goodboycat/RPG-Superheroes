@@ -12,6 +12,9 @@ import * as UI from './js/ui-components.js';
 window.currentHeroes = [];
 window.currentDungeons = [];
 window.currentBanners = [];
+window.explorationSession = null;
+window.explorationInterval = null;
+window.selectedHeroes = [];
 
 // =====================================================
 // AUTH FUNCTIONS
@@ -88,6 +91,7 @@ async function initGameDashboard() {
     
     document.getElementById('welcomeScreen').classList.add('hidden');
     document.getElementById('gameDashboard').classList.remove('hidden');
+    document.getElementById('bottomNav').classList.remove('hidden');
     document.getElementById('authButtons').classList.add('hidden');
     document.getElementById('logoutButton').classList.remove('hidden');
     document.getElementById('playerInfo').classList.remove('hidden');
@@ -130,6 +134,9 @@ window.showTab = function(tabName) {
       break;
     case 'gacha':
       loadGacha();
+      break;
+    case 'exploration':
+      loadExploration();
       break;
     case 'dungeons':
       loadDungeons();
@@ -483,6 +490,315 @@ async function loadInventory() {
     `;
   } catch (error) {
     console.error('Failed to load inventory:', error);
+  }
+}
+
+// =====================================================
+// EXPLORATION TAB
+// =====================================================
+
+async function loadExploration() {
+  try {
+    const session = await API.getExplorationSession();
+    window.explorationSession = session;
+    window.selectedHeroes = [];
+    
+    const explorationTab = document.getElementById('explorationTab');
+    explorationTab.innerHTML = `
+      <h2 class="text-xl md:text-2xl font-bold mb-4 game-font text-shadow-game">
+        <i class="fas fa-map-marked-alt"></i> Exploration Area
+      </h2>
+      
+      <!-- Stats Bar -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+        <div class="bg-game-dark p-2 rounded border border-purple-500">
+          <div class="text-xs text-gray-400">Difficulty</div>
+          <div class="text-lg font-bold text-red-400">x${session.area.difficultyMultiplier.toFixed(1)}</div>
+        </div>
+        <div class="bg-game-dark p-2 rounded border border-green-500">
+          <div class="text-xs text-gray-400">Resources</div>
+          <div class="text-lg font-bold text-green-400" id="resourcesGathered">0</div>
+        </div>
+        <div class="bg-game-dark p-2 rounded border border-yellow-500">
+          <div class="text-xs text-gray-400">Waves Defeated</div>
+          <div class="text-lg font-bold text-yellow-400" id="wavesDefeated">0</div>
+        </div>
+        <div class="bg-game-dark p-2 rounded border border-blue-500">
+          <div class="text-xs text-gray-400">Battle Status</div>
+          <div class="text-lg font-bold text-blue-400" id="battleStatus">Idle</div>
+        </div>
+      </div>
+      
+      <!-- Map Canvas -->
+      <div class="bg-gray-900 rounded-lg border-4 border-purple-600 mb-4 relative overflow-hidden" style="height: 400px;">
+        <canvas id="explorationMap" width="1000" height="800" style="width: 100%; height: 100%; image-rendering: pixelated;"></canvas>
+        <div class="absolute top-2 left-2 bg-black bg-opacity-70 p-2 rounded text-xs">
+          <div>🎯 Center Spawn: (500, 400)</div>
+          <div id="heroPosition">👥 Heroes: Center</div>
+        </div>
+      </div>
+      
+      <!-- Resource Nodes -->
+      <div class="mb-4">
+        <h3 class="text-lg font-bold mb-2">Resource Nodes</h3>
+        <div id="resourceNodesList" class="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-48 overflow-y-auto"></div>
+      </div>
+      
+      <!-- Hero Selection for Dispatch -->
+      <div class="mb-4">
+        <h3 class="text-lg font-bold mb-2">Dispatch Heroes (Select for Resource Gathering)</h3>
+        <div id="heroSelectionList" class="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-48 overflow-y-auto"></div>
+      </div>
+      
+      <!-- Battle Controls -->
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="startAutoBattle()" class="btn-game btn-success py-3">
+          <i class="fas fa-play"></i> Start Auto-Battle
+        </button>
+        <button onclick="stopAutoBattle()" class="btn-game btn-danger py-3">
+          <i class="fas fa-stop"></i> Stop Auto-Battle
+        </button>
+      </div>
+    `;
+    
+    drawExplorationMap();
+    updateResourceNodesList();
+    loadHeroesForDispatch();
+  } catch (error) {
+    console.error('Failed to load exploration:', error);
+  }
+}
+
+function drawExplorationMap() {
+  const canvas = document.getElementById('explorationMap');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  const session = window.explorationSession;
+  if (!session) return;
+  
+  // Clear canvas
+  ctx.fillStyle = '#1a1a2e';
+  ctx.fillRect(0, 0, 1000, 800);
+  
+  // Draw grid
+  ctx.strokeStyle = 'rgba(100, 100, 150, 0.2)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < 1000; x += 50) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, 800);
+    ctx.stroke();
+  }
+  for (let y = 0; y < 800; y += 50) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(1000, y);
+    ctx.stroke();
+  }
+  
+  // Draw center spawn area
+  const centerX = session.area.centerX;
+  const centerY = session.area.centerY;
+  ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, 50, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0, 255, 0, 0.8)';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  
+  ctx.fillStyle = 'white';
+  ctx.font = '20px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('🏠 SPAWN', centerX, centerY);
+  
+  // Draw resource nodes
+  session.area.resourceNodes.forEach(node => {
+    const colors = {
+      common: '#888888',
+      uncommon: '#4ade80',
+      rare: '#3b82f6',
+      epic: '#a855f7',
+      legendary: '#fbbf24'
+    };
+    
+    ctx.fillStyle = node.isActive ? colors[node.rarity] : '#333333';
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, 15, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.fillStyle = 'white';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(node.isActive ? '💎' : '⏳', node.x, node.y + 4);
+  });
+  
+  // Draw enemy waves
+  session.area.enemyWaves.forEach((wave, idx) => {
+    if (wave.hp > 0) {
+      const waveX = 200 + (idx % 3) * 300;
+      const waveY = 150 + Math.floor(idx / 3) * 200;
+      
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+      ctx.beginPath();
+      ctx.arc(waveX, waveY, 30, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = 'white';
+      ctx.font = '16px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('👹', waveX, waveY + 5);
+      
+      // Health bar
+      const barWidth = 60;
+      const barHeight = 8;
+      const healthPercent = wave.hp / wave.maxHp;
+      
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(waveX - barWidth/2, waveY + 35, barWidth, barHeight);
+      
+      ctx.fillStyle = healthPercent > 0.5 ? '#4ade80' : healthPercent > 0.25 ? '#fbbf24' : '#ef4444';
+      ctx.fillRect(waveX - barWidth/2, waveY + 35, barWidth * healthPercent, barHeight);
+      
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(waveX - barWidth/2, waveY + 35, barWidth, barHeight);
+    }
+  });
+  
+  // Draw heroes at center (placeholder)
+  ctx.fillStyle = 'rgba(0, 150, 255, 0.8)';
+  ctx.font = '24px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('👥', centerX, centerY + 30);
+}
+
+function updateResourceNodesList() {
+  const session = window.explorationSession;
+  if (!session) return;
+  
+  const listDiv = document.getElementById('resourceNodesList');
+  listDiv.innerHTML = session.area.resourceNodes.map(node => {
+    const rarityColors = {
+      common: 'gray',
+      uncommon: 'green',
+      rare: 'blue',
+      epic: 'purple',
+      legendary: 'yellow'
+    };
+    
+    return `
+      <div class="bg-game-dark p-2 rounded border-2 border-${rarityColors[node.rarity]}-500 ${!node.isActive ? 'opacity-50' : ''}">
+        <div class="text-xs font-bold capitalize">${node.type}</div>
+        <div class="text-xs text-${rarityColors[node.rarity]}-400">${node.rarity}</div>
+        <div class="text-xs">${node.isActive ? '✅ Active' : '⏳ Cooldown'}</div>
+        <div class="text-xs mt-1">Gather: ${node.gatherTime}s</div>
+        ${node.isActive ? `
+          <button onclick="selectNodeForDispatch('${node.id}')" class="btn-game btn-primary text-xs py-1 px-2 mt-1 w-full">
+            Dispatch Hero
+          </button>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+async function loadHeroesForDispatch() {
+  try {
+    const heroes = await API.getPlayerHeroes();
+    const listDiv = document.getElementById('heroSelectionList');
+    
+    listDiv.innerHTML = heroes.slice(0, 10).map(hero => `
+      <div class="bg-game-dark p-2 rounded border-2 ${window.selectedHeroes.includes(hero.id) ? 'border-green-500' : 'border-gray-600'} cursor-pointer"
+           onclick="toggleHeroSelection(${hero.id})">
+        <div class="text-2xl text-center">${hero.avatar_url}</div>
+        <div class="text-xs text-center font-bold">${hero.name}</div>
+        <div class="text-xs text-center">Lv.${hero.current_level}</div>
+        ${window.selectedHeroes.includes(hero.id) ? '<div class="text-xs text-center text-green-400">✅ Selected</div>' : ''}
+      </div>
+    `).join('');
+  } catch (error) {
+    console.error('Failed to load heroes:', error);
+  }
+}
+
+window.toggleHeroSelection = function(heroId) {
+  const idx = window.selectedHeroes.indexOf(heroId);
+  if (idx > -1) {
+    window.selectedHeroes.splice(idx, 1);
+  } else {
+    if (window.selectedHeroes.length >= 5) {
+      UI.showToast('Maximum 5 heroes can be selected', 'warning');
+      return;
+    }
+    window.selectedHeroes.push(heroId);
+  }
+  loadHeroesForDispatch();
+}
+
+window.selectNodeForDispatch = async function(nodeId) {
+  if (window.selectedHeroes.length === 0) {
+    UI.showToast('Please select a hero first!', 'warning');
+    return;
+  }
+  
+  const heroId = window.selectedHeroes[0];
+  
+  try {
+    await API.dispatchHeroToResource(heroId, nodeId);
+    window.selectedHeroes = window.selectedHeroes.filter(id => id !== heroId);
+    loadExploration(); // Reload
+  } catch (error) {
+    console.error('Failed to dispatch hero:', error);
+  }
+}
+
+window.startAutoBattle = function() {
+  if (window.explorationInterval) {
+    UI.showToast('Auto-battle already running!', 'warning');
+    return;
+  }
+  
+  UI.showToast('Auto-battle started!', 'success');
+  document.getElementById('battleStatus').textContent = 'Fighting!';
+  
+  window.explorationInterval = setInterval(async () => {
+    try {
+      const result = await API.explorationBattleTick(window.explorationSession.sessionId);
+      
+      if (result.victory) {
+        UI.showToast('🎉 Wave defeated!', 'success');
+        const currentWaves = parseInt(document.getElementById('wavesDefeated').textContent);
+        document.getElementById('wavesDefeated').textContent = currentWaves + 1;
+      }
+      
+      if (result.heroesDefeated) {
+        UI.showToast('💀 Heroes defeated! Respawning at center...', 'error');
+        document.getElementById('heroPosition').textContent = '👥 Heroes: Respawned at Center';
+      }
+      
+      if (result.missionComplete) {
+        UI.showToast('🎯 Mission complete! Difficulty increased!', 'success');
+      }
+      
+      // Update session
+      window.explorationSession = result.session;
+      drawExplorationMap();
+      
+    } catch (error) {
+      console.error('Battle tick failed:', error);
+      stopAutoBattle();
+    }
+  }, 2000); // Battle tick every 2 seconds
+}
+
+window.stopAutoBattle = function() {
+  if (window.explorationInterval) {
+    clearInterval(window.explorationInterval);
+    window.explorationInterval = null;
+    UI.showToast('Auto-battle stopped', 'info');
+    document.getElementById('battleStatus').textContent = 'Idle';
   }
 }
 

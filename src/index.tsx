@@ -9,6 +9,7 @@ import heroes from './routes/heroes'
 import gacha from './routes/gacha'
 import dungeons from './routes/dungeons'
 import team from './routes/team'
+import exploration from './routes/exploration'
 
 // Types for Cloudflare bindings
 type Bindings = {
@@ -30,6 +31,7 @@ app.route('/api/heroes', heroes)
 app.route('/api/gacha', gacha)
 app.route('/api/dungeons', dungeons)
 app.route('/api/team', team)
+app.route('/api/exploration', exploration)
 
 // Health check
 app.get('/api/health', (c) => {
@@ -119,8 +121,8 @@ app.get('/', (c) => {
             <!-- Welcome Screen -->
             <div id="welcomeScreen" class="text-center py-10 md:py-20 px-4">
                 <div class="float-animation">
-                    <h2 class="text-4xl md:text-6xl font-bold mb-6 game-font text-shadow-game">⚡ RPG SUPERHEROES ⚡</h2>
-                    <p class="text-lg md:text-2xl mb-8">Collect Heroes • Build Teams • Conquer Dungeons</p>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-4 game-font text-shadow-game">⚡ RPG SUPERHEROES ⚡</h2>
+                    <p class="text-base md:text-lg mb-6">Collect Heroes • Build Teams • Explore & Battle</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto mt-12">
                     <div class="bg-white bg-opacity-10 p-4 md:p-6 rounded-lg backdrop-blur-sm border-2 border-purple-500 shadow-pixel">
@@ -142,33 +144,45 @@ app.get('/', (c) => {
             </div>
 
             <!-- Game Dashboard -->
-            <div id="gameDashboard" class="hidden container mx-auto p-3 md:p-6">
-                <!-- Menu Tabs -->
-                <div class="flex overflow-x-auto gap-2 mb-6 pb-2" style="-webkit-overflow-scrolling: touch;">
-                    <button onclick="showTab('heroes')" class="tab-btn btn-game btn-primary text-xs md:text-sm whitespace-nowrap px-4 py-3">
-                        <i class="fas fa-users"></i> Heroes
-                    </button>
-                    <button onclick="showTab('gacha')" class="tab-btn btn-game btn-legendary text-xs md:text-sm whitespace-nowrap px-4 py-3 pulse">
-                        <i class="fas fa-dice"></i> Gacha
-                    </button>
-                    <button onclick="showTab('dungeons')" class="tab-btn btn-game btn-danger text-xs md:text-sm whitespace-nowrap px-4 py-3">
-                        <i class="fas fa-dungeon"></i> Dungeons
-                    </button>
-                    <button onclick="showTab('team')" class="tab-btn btn-game btn-success text-xs md:text-sm whitespace-nowrap px-4 py-3">
-                        <i class="fas fa-users-cog"></i> Team AI
-                    </button>
-                    <button onclick="showTab('inventory')" class="tab-btn btn-game btn-warning text-xs md:text-sm whitespace-nowrap px-4 py-3">
-                        <i class="fas fa-backpack"></i> Items
-                    </button>
-                </div>
-
+            <div id="gameDashboard" class="hidden container mx-auto p-3 md:p-6" style="padding-bottom: 100px;">
                 <!-- Tab Contents -->
                 <div id="heroesTab" class="tab-content hidden"></div>
                 <div id="gachaTab" class="tab-content hidden"></div>
+                <div id="explorationTab" class="tab-content hidden"></div>
                 <div id="dungeonsTab" class="tab-content hidden"></div>
                 <div id="teamTab" class="tab-content hidden"></div>
                 <div id="inventoryTab" class="tab-content hidden"></div>
             </div>
+
+            <!-- Bottom Navigation Bar -->
+            <nav id="bottomNav" class="hidden fixed bottom-0 left-0 right-0 bg-game-darker backdrop-blur-md border-t-4 border-purple-600 shadow-pixel z-50">
+                <div class="flex justify-around items-center h-16 px-2">
+                    <button onclick="showTab('heroes')" class="tab-btn flex flex-col items-center justify-center flex-1 py-2 px-1 hover:bg-purple-800 hover:bg-opacity-30 transition-all rounded">
+                        <i class="fas fa-users text-lg mb-1"></i>
+                        <span class="text-xs">Heroes</span>
+                    </button>
+                    <button onclick="showTab('gacha')" class="tab-btn flex flex-col items-center justify-center flex-1 py-2 px-1 hover:bg-yellow-600 hover:bg-opacity-30 transition-all rounded pulse">
+                        <i class="fas fa-dice text-lg mb-1"></i>
+                        <span class="text-xs">Gacha</span>
+                    </button>
+                    <button onclick="showTab('exploration')" class="tab-btn flex flex-col items-center justify-center flex-1 py-2 px-1 hover:bg-green-600 hover:bg-opacity-30 transition-all rounded">
+                        <i class="fas fa-map-marked-alt text-lg mb-1"></i>
+                        <span class="text-xs">Explore</span>
+                    </button>
+                    <button onclick="showTab('dungeons')" class="tab-btn flex flex-col items-center justify-center flex-1 py-2 px-1 hover:bg-red-600 hover:bg-opacity-30 transition-all rounded">
+                        <i class="fas fa-dungeon text-lg mb-1"></i>
+                        <span class="text-xs">Dungeons</span>
+                    </button>
+                    <button onclick="showTab('team')" class="tab-btn flex flex-col items-center justify-center flex-1 py-2 px-1 hover:bg-blue-600 hover:bg-opacity-30 transition-all rounded">
+                        <i class="fas fa-users-cog text-lg mb-1"></i>
+                        <span class="text-xs">Team</span>
+                    </button>
+                    <button onclick="showTab('inventory')" class="tab-btn flex flex-col items-center justify-center flex-1 py-2 px-1 hover:bg-orange-600 hover:bg-opacity-30 transition-all rounded">
+                        <i class="fas fa-backpack text-lg mb-1"></i>
+                        <span class="text-xs">Items</span>
+                    </button>
+                </div>
+            </nav>
         </div>
 
         <!-- Auth Modal -->

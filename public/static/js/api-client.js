@@ -310,6 +310,57 @@ export async function getDungeonTeam(dungeonId, teamSize = 5) {
   }
 }
 
+// =====================================================
+// EXPLORATION API
+// =====================================================
+
+export async function getExplorationSession() {
+  const data = await apiCall('/exploration/session');
+  return data;
+}
+
+export async function dispatchHeroToResource(heroId, resourceNodeId) {
+  showLoading('Dispatching hero...');
+  try {
+    const data = await apiCall('/exploration/dispatch', {
+      method: 'POST',
+      body: JSON.stringify({ heroId, resourceNodeId })
+    });
+    
+    hideLoading();
+    showToast('Hero dispatched to gather resources!', 'success');
+    return data;
+  } catch (error) {
+    hideLoading();
+    throw error;
+  }
+}
+
+export async function claimResourceGather(dispatchId) {
+  showLoading('Claiming resources...');
+  try {
+    const data = await apiCall('/exploration/claim', {
+      method: 'POST',
+      body: JSON.stringify({ dispatchId })
+    });
+    
+    hideLoading();
+    showToast(`Claimed ${data.amount}x ${data.resourceType}!`, 'success');
+    return data;
+  } catch (error) {
+    hideLoading();
+    throw error;
+  }
+}
+
+export async function explorationBattleTick(sessionId) {
+  const data = await apiCall('/exploration/battle-tick', {
+    method: 'POST',
+    body: JSON.stringify({ sessionId })
+  });
+  return data;
+}
+
 // Export auth check
 export function isAuthenticated() {
   return !!authToken;
