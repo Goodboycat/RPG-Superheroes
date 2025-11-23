@@ -4,6 +4,8 @@
 
 import * as API from './js/api-client.js';
 import * as UI from './js/ui-components.js';
+import * as EnhancedUI from './js/enhanced-ui.js';
+import * as BattleSystem from './js/battle-system.js';
 
 // =====================================================
 // GLOBAL STATE
@@ -177,8 +179,8 @@ async function loadHeroes() {
       <h2 class="text-2xl md:text-3xl font-bold mb-6 game-font text-shadow-game">
         <i class="fas fa-users"></i> Your Heroes (${heroes.length})
       </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        ${heroes.map(hero => UI.createHeroCard(hero)).join('')}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        ${heroes.map(hero => EnhancedUI.createEnhancedHeroCard(hero)).join('')}
       </div>
     `;
   } catch (error) {
@@ -264,15 +266,19 @@ window.showHeroDetails = function(heroId) {
 async function loadGacha() {
   try {
     const banners = await API.getGachaBanners();
-    window.currentBanners = banners;
+    // Filter to show only Normal (basic) and Advanced
+    const filteredBanners = banners.filter(b => 
+      b.banner_type === 'basic' || b.banner_type === 'advanced'
+    );
+    window.currentBanners = filteredBanners;
     
     const gachaTab = document.getElementById('gachaTab');
     gachaTab.innerHTML = `
       <h2 class="text-2xl md:text-3xl font-bold mb-6 game-font text-shadow-game">
-        <i class="fas fa-dice"></i> Gacha Summons
+        <i class="fas fa-dice"></i> Hero Summons
       </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        ${banners.map(banner => UI.createGachaBannerCard(banner)).join('')}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 max-w-4xl mx-auto">
+        ${filteredBanners.map(banner => EnhancedUI.createEnhancedGachaBanner(banner)).join('')}
       </div>
       <div id="gachaResults"></div>
     `;
@@ -284,40 +290,17 @@ async function loadGacha() {
 window.pullGacha = async function(bannerId, pullType) {
   try {
     const data = await API.pullGacha(bannerId, pullType);
-    displayGachaResults(data.results);
     
-    const player = await API.getPlayerProfile();
-    updatePlayerInfo(player);
+    // Use enhanced animation
+    EnhancedUI.animateGachaPull(data.results, async () => {
+      const player = await API.getPlayerProfile();
+      updatePlayerInfo(player);
+      await loadHeroes(); // Refresh hero list
+    });
+    
   } catch (error) {
     console.error('Gacha pull failed:', error);
   }
-}
-
-function displayGachaResults(results) {
-  const resultsDiv = document.getElementById('gachaResults');
-  
-  resultsDiv.innerHTML = `
-    <div class="bg-black bg-opacity-70 p-6 rounded-lg border-4 border-yellow-500 bounce-in">
-      <h3 class="text-3xl font-bold mb-6 text-center game-font text-shadow-game">🎉 SUMMON RESULTS! 🎉</h3>
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-        ${results.map(hero => `
-          <div class="hero-card rarity-border-${UI.getRarityClass(hero.rarity)} p-4 rounded-lg text-center bounce-in">
-            <div class="text-5xl mb-3">${hero.avatar}</div>
-            <div class="font-bold text-sm mb-2">${hero.name}</div>
-            <div class="type-badge type-badge-${UI.getTypeClass(hero.powerType)} text-xs mb-2">${hero.powerType}</div>
-            <div class="rarity-bg-${UI.getRarityClass(hero.rarity)} px-3 py-1 rounded font-bold">
-              ${hero.rarity}
-            </div>
-            ${hero.isNew ? '<div class="text-yellow-300 text-xs mt-2">✨ NEW!</div>' : ''}
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `;
-  
-  setTimeout(() => {
-    resultsDiv.innerHTML = '';
-  }, 15000);
 }
 
 // =====================================================
@@ -344,31 +327,43 @@ async function loadDungeons() {
 }
 
 window.enterDungeon = async function(dungeonId) {
-  if (!confirm('Enter this dungeon? (This will consume energy)')) {
-    return;
-  }
-  
   try {
     const heroes = await API.getPlayerHeroes();
-    const teamHeroIds = heroes.slice(0, 5).map(h => h.id);
+    const playerTeam = heroes.slice(0, 5);
     
-    if (teamHeroIds.length === 0) {
+    if (playerTeam.length === 0) {
       UI.showToast('You need heroes! Try gacha first!', 'warning');
       return;
     }
     
-    const data = await API.enterDungeon(dungeonId, teamHeroIds);
-    
-    if (data.victory && data.rewards) {
-      setTimeout(() => {
-        const rewardsText = data.rewards.map(r => `${r.amount}x ${r.type}`).join(', ');
-        UI.showToast('Rewards: ' + rewardsText, 'success');
-      }, 1000);
+    // Get dungeon data
+    const dungeon = window.currentDungeons.find(d => d.id === dungeonId);
+    if (!dungeon) {
+      UI.showToast('Dungeon not found!', 'error');
+      return;
     }
     
-    const player = await API.getPlayerProfile();
-    updatePlayerInfo(player);
-    loadDungeons();
+    // Create mock enemy data for battle
+    const enemyTeam = Array.from({ length: 3 }, (_, i) => ({
+      name: `Enemy ${i + 1}`,
+      level: dungeon.required_level || 1,
+      hp: 100 + dungeon.required_level * 20,
+      attack: 40 + dungeon.required_level * 5,
+      power_type: ['fire', 'water', 'earth', 'air'][Math.floor(Math.random() * 4)],
+      avatar: ['👹', '👺', '👻', '💀', '👾'][Math.floor(Math.random() * 5)]
+    }));
+    
+    // Start Pokemon-style battle
+    await BattleSystem.startDungeonBattle(dungeonId, playerTeam, {
+      enemies: enemyTeam
+    });
+    
+    // Update player info after battle
+    setTimeout(async () => {
+      const player = await API.getPlayerProfile();
+      updatePlayerInfo(player);
+    }, 2000);
+    
   } catch (error) {
     console.error('Battle failed:', error);
   }
@@ -501,19 +496,20 @@ async function loadExploration() {
   try {
     const session = await API.getExplorationSession();
     window.explorationSession = session;
-    window.selectedHeroes = [];
+    window.explorationTeam = []; // Combat team
+    window.explorationFarmers = []; // Resource farmers
     
     const explorationTab = document.getElementById('explorationTab');
     explorationTab.innerHTML = `
       <h2 class="text-xl md:text-2xl font-bold mb-4 game-font text-shadow-game">
-        <i class="fas fa-map-marked-alt"></i> Exploration Area
+        <i class="fas fa-map-marked-alt"></i> Live Exploration
       </h2>
       
       <!-- Stats Bar -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+      <div class="grid grid-cols-3 gap-2 mb-4">
         <div class="bg-game-dark p-2 rounded border border-purple-500">
           <div class="text-xs text-gray-400">Difficulty</div>
-          <div class="text-lg font-bold text-red-400">x${session.area.difficultyMultiplier.toFixed(1)}</div>
+          <div class="text-lg font-bold text-red-400" id="difficultyLevel">x1.0</div>
         </div>
         <div class="bg-game-dark p-2 rounded border border-green-500">
           <div class="text-xs text-gray-400">Resources</div>
@@ -523,47 +519,55 @@ async function loadExploration() {
           <div class="text-xs text-gray-400">Waves Defeated</div>
           <div class="text-lg font-bold text-yellow-400" id="wavesDefeated">0</div>
         </div>
-        <div class="bg-game-dark p-2 rounded border border-blue-500">
-          <div class="text-xs text-gray-400">Battle Status</div>
-          <div class="text-lg font-bold text-blue-400" id="battleStatus">Idle</div>
-        </div>
       </div>
       
       <!-- Map Canvas -->
-      <div class="bg-gray-900 rounded-lg border-4 border-purple-600 mb-4 relative overflow-hidden" style="height: 400px;">
+      <div class="bg-gray-900 rounded-lg border-4 border-purple-600 mb-4 relative overflow-hidden" style="height: 350px;">
         <canvas id="explorationMap" width="1000" height="800" style="width: 100%; height: 100%; image-rendering: pixelated;"></canvas>
         <div class="absolute top-2 left-2 bg-black bg-opacity-70 p-2 rounded text-xs">
-          <div>🎯 Center Spawn: (500, 400)</div>
-          <div id="heroPosition">👥 Heroes: Center</div>
+          <div id="battleStatus" class="text-green-400">⏸️ Paused</div>
         </div>
       </div>
       
-      <!-- Resource Nodes -->
-      <div class="mb-4">
-        <h3 class="text-lg font-bold mb-2">Resource Nodes</h3>
-        <div id="resourceNodesList" class="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-48 overflow-y-auto"></div>
+      <!-- Team Setup -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <!-- Combat Team -->
+        <div class="bg-game-dark p-3 rounded border border-red-500">
+          <h3 class="text-sm font-bold mb-2">⚔️ Combat Team (1 Team Only)</h3>
+          <div id="combatTeamDisplay" class="min-h-[60px] flex gap-2 items-center">
+            <button onclick="selectCombatTeam()" class="btn-game btn-danger text-xs py-2 px-3">
+              Select Team
+            </button>
+          </div>
+        </div>
+        
+        <!-- Resource Farmers -->
+        <div class="bg-game-dark p-3 rounded border border-green-500">
+          <h3 class="text-sm font-bold mb-2">🌾 Farmers (Any Heroes)</h3>
+          <div id="farmersDisplay" class="min-h-[60px] flex gap-2 items-center">
+            <button onclick="selectFarmers()" class="btn-game btn-success text-xs py-2 px-3">
+              Select Farmers
+            </button>
+          </div>
+        </div>
       </div>
       
-      <!-- Hero Selection for Dispatch -->
+      <!-- Resource Nodes (Compact) -->
       <div class="mb-4">
-        <h3 class="text-lg font-bold mb-2">Dispatch Heroes (Select for Resource Gathering)</h3>
-        <div id="heroSelectionList" class="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-48 overflow-y-auto"></div>
+        <h3 class="text-sm font-bold mb-2">💎 Active Resources</h3>
+        <div id="resourceNodesList" class="grid grid-cols-3 md:grid-cols-6 gap-1 text-xs"></div>
       </div>
       
-      <!-- Battle Controls -->
-      <div class="grid grid-cols-2 gap-2">
-        <button onclick="startAutoBattle()" class="btn-game btn-success py-3">
-          <i class="fas fa-play"></i> Start Auto-Battle
-        </button>
-        <button onclick="stopAutoBattle()" class="btn-game btn-danger py-3">
-          <i class="fas fa-stop"></i> Stop Auto-Battle
-        </button>
-      </div>
+      <!-- Start Button -->
+      <button onclick="toggleExploration()" id="explorationToggle" 
+              class="w-full btn-game btn-legendary py-4 text-lg pulse">
+        <i class="fas fa-play"></i> START LIVE EXPLORATION
+      </button>
     `;
     
     drawExplorationMap();
-    updateResourceNodesList();
-    loadHeroesForDispatch();
+    updateResourceNodesCompact();
+    
   } catch (error) {
     console.error('Failed to load exploration:', error);
   }
@@ -799,6 +803,109 @@ window.stopAutoBattle = function() {
     window.explorationInterval = null;
     UI.showToast('Auto-battle stopped', 'info');
     document.getElementById('battleStatus').textContent = 'Idle';
+  }
+}
+
+// Enhanced Exploration Functions
+window.selectCombatTeam = async function() {
+  const heroes = await API.getPlayerHeroes();
+  const selected = prompt(`Select hero IDs (comma-separated, max 5):\n${heroes.map((h, i) => `${i}: ${h.name}`).join('\n')}`);
+  if (!selected) return;
+  
+  const indices = selected.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+  window.explorationTeam = indices.slice(0, 5).map(i => heroes[i]).filter(h => h);
+  
+  document.getElementById('combatTeamDisplay').innerHTML = `
+    <div class="flex gap-1 flex-wrap">
+      ${window.explorationTeam.map(h => `<span class="text-2xl" title="${h.name}">${h.avatar_url}</span>`).join('')}
+    </div>
+  `;
+}
+
+window.selectFarmers = async function() {
+  const heroes = await API.getPlayerHeroes();
+  const selected = prompt(`Select farmer IDs (comma-separated, any amount):\n${heroes.map((h, i) => `${i}: ${h.name}`).join('\n')}`);
+  if (!selected) return;
+  
+  const indices = selected.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+  window.explorationFarmers = indices.map(i => heroes[i]).filter(h => h);
+  
+  document.getElementById('farmersDisplay').innerHTML = `
+    <div class="flex gap-1 flex-wrap">
+      ${window.explorationFarmers.map(h => `<span class="text-2xl" title="${h.name}">${h.avatar_url}</span>`).join('')}
+    </div>
+  `;
+}
+
+function updateResourceNodesCompact() {
+  const session = window.explorationSession;
+  if (!session) return;
+  
+  const listDiv = document.getElementById('resourceNodesList');
+  const activeNodes = session.area.resourceNodes.filter(n => n.isAlive);
+  
+  listDiv.innerHTML = activeNodes.slice(0, 12).map(node => {
+    const rarityEmoji = {
+      common: '⚪',
+      uncommon: '🟢',
+      rare: '🔵',
+      epic: '🟣',
+      legendary: '🟡'
+    }[node.rarity];
+    
+    return `<div class="bg-black bg-opacity-50 p-1 rounded text-center">${rarityEmoji}</div>`;
+  }).join('');
+}
+
+window.toggleExploration = function() {
+  if (window.explorationInterval) {
+    // Stop
+    clearInterval(window.explorationInterval);
+    window.explorationInterval = null;
+    document.getElementById('explorationToggle').innerHTML = '<i class="fas fa-play"></i> START LIVE EXPLORATION';
+    document.getElementById('battleStatus').innerHTML = '⏸️ Paused';
+  } else {
+    // Start
+    if (!window.explorationTeam || window.explorationTeam.length === 0) {
+      UI.showToast('Please select a combat team first!', 'warning');
+      return;
+    }
+    
+    document.getElementById('explorationToggle').innerHTML = '<i class="fas fa-stop"></i> STOP EXPLORATION';
+    document.getElementById('battleStatus').innerHTML = '⚔️ Fighting!';
+    
+    // Live exploration loop
+    window.explorationInterval = setInterval(async () => {
+      try {
+        // Simulated battle and farming
+        const wavesEl = document.getElementById('wavesDefeated');
+        const resourcesEl = document.getElementById('resourcesGathered');
+        const difficultyEl = document.getElementById('difficultyLevel');
+        
+        // Increment waves (every 3 seconds = 1 wave)
+        const currentWaves = parseInt(wavesEl.textContent);
+        wavesEl.textContent = currentWaves + 1;
+        
+        // Farm resources if farmers are active
+        if (window.explorationFarmers && window.explorationFarmers.length > 0) {
+          const currentResources = parseInt(resourcesEl.textContent);
+          const farmRate = window.explorationFarmers.length;
+          resourcesEl.textContent = currentResources + farmRate;
+        }
+        
+        // Increase difficulty every 5 waves
+        if ((currentWaves + 1) % 5 === 0) {
+          const newDifficulty = 1.0 + Math.floor((currentWaves + 1) / 5) * 0.5;
+          difficultyEl.textContent = `x${newDifficulty.toFixed(1)}`;
+          UI.showToast('Difficulty increased!', 'warning');
+        }
+        
+        drawExplorationMap();
+        
+      } catch (error) {
+        console.error('Exploration tick failed:', error);
+      }
+    }, 3000); // Every 3 seconds
   }
 }
 

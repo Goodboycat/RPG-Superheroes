@@ -455,3 +455,291 @@
 .bg-game-darker {
   background: linear-gradient(135deg, #0a0a0f, var(--ui-primary));
 }
+
+/* =====================================================
+   ENHANCED UI STYLES - IMPROVEMENTS
+   ===================================================== */
+
+/* === ENHANCED HERO CARDS === */
+.hero-card-enhanced {
+  position: relative;
+  padding: 20px;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.hero-card-enhanced:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.hero-card-enhanced::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.rarity-badge-c { background: #6c757d; color: white; }
+.rarity-badge-b { background: #28a745; color: white; }
+.rarity-badge-a { background: #007bff; color: white; }
+.rarity-badge-s { background: #6f42c1; color: white; }
+.rarity-badge-ss { background: #dc3545; color: white; }
+.rarity-badge-sss { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; animation: pulse-gold 2s infinite; }
+
+/* === GACHA ANIMATION === */
+.gacha-animation-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.gacha-animation-container {
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  text-align: center;
+}
+
+.gacha-pull-title {
+  font-size: 48px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+  margin-bottom: 32px;
+  animation: pulse-gold 1s infinite;
+}
+
+.gacha-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  margin: 32px 0;
+}
+
+.gacha-card-flip {
+  width: 180px;
+  height: 240px;
+  perspective: 1000px;
+}
+
+.gacha-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.gacha-card-flip.flipped .gacha-card-inner {
+  transform: rotateY(180deg);
+}
+
+.gacha-card-front, .gacha-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.gacha-card-front {
+  background: linear-gradient(135deg, #2d3748, #1a202c);
+  animation: card-glow 1.5s infinite;
+}
+
+.gacha-card-back {
+  transform: rotateY(180deg);
+}
+
+@keyframes card-glow {
+  0%, 100% { box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); }
+  50% { box-shadow: 0 8px 32px rgba(255, 215, 0, 0.6); }
+}
+
+/* === ENHANCED GACHA BANNERS === */
+.gacha-banner-enhanced {
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease;
+}
+
+.gacha-banner-enhanced:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+}
+
+.rate-box {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* === BATTLE ARENA === */
+.battle-arena-container {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+  z-index: 9999;
+}
+
+.battle-background canvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.battle-ui-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.battle-sprite {
+  position: absolute;
+  pointer-events: all;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.sprite-emoji {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  transition: transform 0.2s ease;
+}
+
+.battle-sprite:hover .sprite-emoji {
+  transform: scale(1.1);
+}
+
+.sprite-healthbar {
+  width: 100px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  margin: 8px auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.healthbar-fill {
+  height: 100%;
+  transition: width 0.5s ease, background 0.3s ease;
+}
+
+.battle-attack-anim {
+  animation: attack-move 0.3s ease-out;
+}
+
+@keyframes attack-move {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(20px); }
+}
+
+.battle-hit-anim {
+  animation: hit-shake 0.3s ease-out;
+}
+
+@keyframes hit-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.damage-number {
+  animation: damageFloat 1s ease-out forwards;
+}
+
+@keyframes damageFloat {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-50px) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.battle-log {
+  position: absolute;
+  bottom: 80px;
+  left: 20px;
+  right: 20px;
+  max-height: 150px;
+  overflow-y: auto;
+  pointer-events: all;
+}
+
+.battle-action-menu {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+  pointer-events: all;
+}
+
+/* === POWER PARTICLE EFFECTS === */
+@keyframes particleBurst {
+  0% {
+    transform: scale(1) translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0) translate(
+      calc(var(--x, 0) * 100px),
+      calc(var(--y, 0) * 100px)
+    );
+    opacity: 0;
+  }
+}
+
+/* === UTILITY ANIMATIONS === */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.bounce-in {
+  animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
