@@ -120,27 +120,71 @@ app.get('/', (c) => {
         </nav>
 
         <div id="app-content">
-            <!-- Welcome Screen -->
-            <div id="welcomeScreen" class="text-center py-10 md:py-20 px-4">
-                <div class="float-animation">
-                    <h2 class="text-2xl md:text-3xl font-bold mb-4 game-font text-shadow-game">⚡ RPG SUPERHEROES ⚡</h2>
-                    <p class="text-base md:text-lg mb-6">Collect Heroes • Build Teams • Explore & Battle</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto mt-12">
-                    <div class="bg-white bg-opacity-10 p-4 md:p-6 rounded-lg backdrop-blur-sm border-2 border-purple-500 shadow-pixel">
-                        <div class="text-4xl md:text-5xl mb-4">🔥</div>
-                        <h3 class="text-lg md:text-xl font-bold mb-2">12 Power Types</h3>
-                        <p class="text-xs md:text-sm opacity-80">Fire, Water, Earth & More!</p>
+            <!-- Enhanced Welcome Screen -->
+            <div id="welcomeScreen" class="min-h-screen flex items-center justify-center px-4 py-10">
+                <div class="max-w-6xl w-full">
+                    <!-- Hero Title -->
+                    <div class="text-center mb-12 float-animation">
+                        <h1 class="text-4xl md:text-6xl font-bold mb-4 game-font text-shadow-game" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ef4444 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">⚡ RPG SUPERHEROES ⚡</h1>
+                        <p class="text-xl md:text-2xl mb-2 text-purple-300">Epic Browser RPG Experience</p>
+                        <p class="text-base md:text-lg text-gray-400">Collect • Battle • Explore • Dominate</p>
                     </div>
-                    <div class="bg-white bg-opacity-10 p-4 md:p-6 rounded-lg backdrop-blur-sm border-2 border-purple-500 shadow-pixel">
-                        <div class="text-4xl md:text-5xl mb-4">🎲</div>
-                        <h3 class="text-lg md:text-xl font-bold mb-2">Gacha System</h3>
-                        <p class="text-xs md:text-sm opacity-80">Pity system & guaranteed SSS!</p>
+                    
+                    <!-- Feature Showcase Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        <div class="feature-card bg-gradient-to-br from-red-600 to-orange-500">
+                            <div class="text-6xl mb-4">🔥</div>
+                            <h3 class="text-2xl font-bold mb-2">12 Power Types</h3>
+                            <p class="text-sm opacity-90">Fire, Water, Earth, Light, Dark & More!</p>
+                        </div>
+                        <div class="feature-card bg-gradient-to-br from-purple-600 to-pink-500">
+                            <div class="text-6xl mb-4">🎴</div>
+                            <h3 class="text-2xl font-bold mb-2">Gacha System</h3>
+                            <p class="text-sm opacity-90">Collect rare heroes with pity system!</p>
+                        </div>
+                        <div class="feature-card bg-gradient-to-br from-blue-600 to-cyan-500">
+                            <div class="text-6xl mb-4">⚔️</div>
+                            <h3 class="text-2xl font-bold mb-2">Pokemon Battles</h3>
+                            <p class="text-sm opacity-90">Turn-based combat with visual effects!</p>
+                        </div>
                     </div>
-                    <div class="bg-white bg-opacity-10 p-4 md:p-6 rounded-lg backdrop-blur-sm border-2 border-purple-500 shadow-pixel">
-                        <div class="text-4xl md:text-5xl mb-4">⚔️</div>
-                        <h3 class="text-lg md:text-xl font-bold mb-2">Epic Battles</h3>
-                        <p class="text-xs md:text-sm opacity-80">Dungeons, Bosses & Arena!</p>
+                    
+                    <!-- Quick Start Actions -->
+                    <div class="text-center">
+                        <h3 class="text-2xl font-bold mb-6 text-purple-300">🎮 Start Your Adventure</h3>
+                        <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+                            <button onclick="showLogin()" class="btn-game btn-primary text-lg px-8 py-4 min-w-[200px]">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </button>
+                            <button onclick="showRegister()" class="btn-game btn-legendary text-lg px-8 py-4 min-w-[200px] pulse">
+                                <i class="fas fa-user-plus"></i> Create Account
+                            </button>
+                        </div>
+                        <div class="mt-4">
+                            <button onclick="showGoogleLogin()" class="btn-game bg-white text-gray-800 hover:bg-gray-100 px-6 py-3">
+                                <i class="fab fa-google"></i> Continue with Google
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Bar -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+                        <div class="stat-box">
+                            <div class="text-3xl font-bold text-yellow-400">15+</div>
+                            <div class="text-sm text-gray-400">Unique Heroes</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="text-3xl font-bold text-purple-400">12</div>
+                            <div class="text-sm text-gray-400">Power Types</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="text-3xl font-bold text-red-400">6</div>
+                            <div class="text-sm text-gray-400">Rarity Tiers</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="text-3xl font-bold text-green-400">∞</div>
+                            <div class="text-sm text-gray-400">Adventures</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -187,22 +231,71 @@ app.get('/', (c) => {
             </nav>
         </div>
 
-        <!-- Auth Modal -->
+        <!-- Enhanced Auth Modal -->
         <div id="authModal" class="hidden modal-overlay">
-            <div class="modal-content max-w-md w-full mx-4">
-                <h3 id="modalTitle" class="text-2xl font-bold mb-4 game-font text-shadow-game">Login</h3>
+            <div class="modal-content max-w-md w-full mx-4 bg-gradient-to-br from-gray-900 to-purple-900 border-4 border-purple-500">
+                <h3 id="modalTitle" class="text-3xl font-bold mb-6 game-font text-shadow-game text-center">Login</h3>
+                
+                <!-- Login Form -->
                 <div id="loginForm">
-                    <input type="text" id="loginUsername" placeholder="Username" class="w-full p-3 mb-3 bg-gray-800 rounded border-2 border-purple-500">
-                    <input type="password" id="loginPassword" placeholder="Password" class="w-full p-3 mb-4 bg-gray-800 rounded border-2 border-purple-500">
-                    <button onclick="login()" class="w-full btn-game btn-primary py-3">Login</button>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold mb-2 text-purple-300">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" id="loginUsername" placeholder="Enter your username" 
+                               class="w-full p-4 bg-gray-800 rounded-lg border-2 border-purple-500 focus:border-purple-400 focus:outline-none">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold mb-2 text-purple-300">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" 
+                               class="w-full p-4 bg-gray-800 rounded-lg border-2 border-purple-500 focus:border-purple-400 focus:outline-none">
+                    </div>
+                    <button onclick="login()" class="w-full btn-game btn-primary py-4 text-lg mb-4">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                    <div class="divider mb-4">OR</div>
+                    <button onclick="loginWithGoogle()" class="w-full bg-white text-gray-800 hover:bg-gray-100 py-3 rounded-lg font-bold transition-all">
+                        <i class="fab fa-google text-red-500"></i> Login with Gmail
+                    </button>
                 </div>
+                
+                <!-- Register Form -->
                 <div id="registerForm" class="hidden">
-                    <input type="text" id="regUsername" placeholder="Username" class="w-full p-3 mb-3 bg-gray-800 rounded border-2 border-purple-500">
-                    <input type="email" id="regEmail" placeholder="Email" class="w-full p-3 mb-3 bg-gray-800 rounded border-2 border-purple-500">
-                    <input type="password" id="regPassword" placeholder="Password" class="w-full p-3 mb-4 bg-gray-800 rounded border-2 border-purple-500">
-                    <button onclick="register()" class="w-full btn-game btn-success py-3">Create Account</button>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold mb-2 text-purple-300">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" id="regUsername" placeholder="Choose a username" 
+                               class="w-full p-4 bg-gray-800 rounded-lg border-2 border-purple-500 focus:border-purple-400 focus:outline-none">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold mb-2 text-purple-300">
+                            <i class="fas fa-envelope"></i> Email
+                        </label>
+                        <input type="email" id="regEmail" placeholder="your.email@example.com" 
+                               class="w-full p-4 bg-gray-800 rounded-lg border-2 border-purple-500 focus:border-purple-400 focus:outline-none">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold mb-2 text-purple-300">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" id="regPassword" placeholder="Create a strong password" 
+                               class="w-full p-4 bg-gray-800 rounded-lg border-2 border-purple-500 focus:border-purple-400 focus:outline-none">
+                    </div>
+                    <button onclick="register()" class="w-full btn-game btn-success py-4 text-lg mb-4">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                    <div class="divider mb-4">OR</div>
+                    <button onclick="registerWithGoogle()" class="w-full bg-white text-gray-800 hover:bg-gray-100 py-3 rounded-lg font-bold transition-all">
+                        <i class="fab fa-google text-red-500"></i> Sign up with Gmail
+                    </button>
                 </div>
-                <button onclick="closeModal()" class="mt-4 text-sm text-gray-400 hover:text-white">Cancel</button>
+                
+                <button onclick="closeModal()" class="mt-6 w-full text-center text-sm text-gray-400 hover:text-white py-2">
+                    Cancel
+                </button>
             </div>
         </div>
 

@@ -36,6 +36,10 @@ window.showRegister = function() {
   document.getElementById('registerForm').classList.remove('hidden');
 }
 
+window.showGoogleLogin = function() {
+  showLogin();
+}
+
 window.closeModal = function() {
   document.getElementById('authModal').classList.add('hidden');
 }
@@ -56,6 +60,42 @@ window.login = async function() {
     initGameDashboard();
   } catch (error) {
     console.error('Login failed:', error);
+    UI.showToast('Login failed. Please check your credentials.', 'error');
+  }
+}
+
+window.loginWithGoogle = async function() {
+  UI.showToast('Google OAuth integration coming soon!', 'info');
+  // For now, show simplified login
+  // In production, this would use Google OAuth 2.0
+  const googleEmail = prompt('Enter your Gmail address (demo):');
+  if (!googleEmail || !googleEmail.includes('@gmail.com')) {
+    UI.showToast('Please enter a valid Gmail address', 'warning');
+    return;
+  }
+  
+  // Auto-create account with Gmail
+  const username = googleEmail.split('@')[0];
+  const password = 'google_' + Math.random().toString(36).substring(7);
+  
+  try {
+    // Try to register
+    await API.register(username, googleEmail, password);
+    UI.showToast('Account created with Gmail!', 'success');
+  } catch (error) {
+    // If already exists, try to login
+    console.log('Account might exist, attempting login...');
+  }
+  
+  // Login with generated credentials
+  try {
+    const data = await API.login(username, password);
+    closeModal();
+    UI.showToast(`Welcome ${username}!`, 'success');
+    initGameDashboard();
+  } catch (error) {
+    console.error('Google login failed:', error);
+    UI.showToast('Please use regular login for existing accounts', 'warning');
   }
 }
 
@@ -69,14 +109,34 @@ window.register = async function() {
     return;
   }
   
+  if (password.length < 6) {
+    UI.showToast('Password must be at least 6 characters', 'warning');
+    return;
+  }
+  
   try {
     await API.register(username, email, password);
     closeModal();
-    UI.showToast('Account created! Welcome!', 'success');
-    setTimeout(() => location.reload(), 1000);
+    UI.showToast('Account created! Logging in...', 'success');
+    
+    // Auto-login after registration
+    setTimeout(async () => {
+      try {
+        const data = await API.login(username, password);
+        UI.showToast(`Welcome, ${username}!`, 'success');
+        initGameDashboard();
+      } catch (error) {
+        UI.showToast('Please login with your new account', 'info');
+      }
+    }, 500);
   } catch (error) {
     console.error('Registration failed:', error);
+    UI.showToast('Registration failed. Username or email may already exist.', 'error');
   }
+}
+
+window.registerWithGoogle = function() {
+  loginWithGoogle(); // Same flow for registration
 }
 
 window.logout = function() {
